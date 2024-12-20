@@ -1,0 +1,9 @@
+INSERT INTO UserQuery (query) VALUES ('Hello there! What is your policy in breif?');
+
+SELECT * from UserQuery;
+
+INSERT INTO ChatBotResponse (response, queryID) VALUES ('Hello User Hope you are doing fine today, Here is a breif of our companies bolicy.', 1);
+
+SELECT * from ChatBotResponse;
+
+SELECT u.query, c.response FROM UserQuery u, ChatBotResponse c where c.queryID = u.id;

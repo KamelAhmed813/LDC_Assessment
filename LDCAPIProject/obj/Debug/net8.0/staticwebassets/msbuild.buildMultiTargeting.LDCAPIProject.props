@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\LDCAPIProject.props" />
+</Project>
