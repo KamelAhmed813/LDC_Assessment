@@ -20,20 +20,20 @@ namespace API.Services
 
         public async Task<int?> SaveQueryAsync(UserQuery query)
         {
-            _context.userQueries.Add(query);
+            _context.UserQueries.Add(query);
             await _context.SaveChangesAsync();
             return query.id;
         }
 
         public async Task<int> SaveResponceAsync(ChatBotResponse chatBotResponse){
-            _context.chatBotResponses.Add(chatBotResponse);
+            _context.ChatBotResponses.Add(chatBotResponse);
             await _context.SaveChangesAsync();
             return chatBotResponse.id;
         }
 
         public async Task<String?> GetResponseAsync(int queryId)
         {
-            ChatBotResponse? botResponse = await _context.chatBotResponses.FirstOrDefaultAsync(r => r.queryId == queryId);
+            ChatBotResponse? botResponse = await _context.ChatBotResponses.FirstOrDefaultAsync(r => r.queryId == queryId);
             if(botResponse != null)
                 return botResponse.response;
             else
@@ -41,7 +41,7 @@ namespace API.Services
         }
 
         public async Task<Boolean> IsUserQuerySavedAsync(int queryId){
-            UserQuery? query = await _context.userQueries.FindAsync(queryId);
+            UserQuery? query = await _context.UserQueries.FindAsync(queryId);
             return !(query == null);
         }
     }

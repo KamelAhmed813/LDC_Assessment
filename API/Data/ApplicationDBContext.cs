@@ -7,15 +7,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
-    public class ApplicationDBContext : DbContext
+    public class ApplicationDBContext(DbContextOptions options) : DbContext(options)
     {
-        public ApplicationDBContext(DbContextOptions options) : base(options)
-        {
-            
-        }
-
-        public DbSet<UserQuery> userQueries { get; set; }
-        public DbSet<ChatBotResponse> chatBotResponses { get; set; }
+        public required DbSet<UserQuery> UserQueries { get; set; }
+        public required DbSet<ChatBotResponse> ChatBotResponses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

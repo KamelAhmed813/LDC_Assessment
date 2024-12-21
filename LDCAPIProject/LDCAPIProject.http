@@ -1,6 +1,0 @@
-@LDCAPIProject_HostAddress = http://localhost:5163
-
-GET {{LDCAPIProject_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
