@@ -167,3 +167,4 @@ E:\project\LDC_Assessment\API\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Ru
 E:\project\LDC_Assessment\API\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll
 E:\project\LDC_Assessment\API\bin\Debug\net8.0\runtimes\browser\lib\net8.0\System.Text.Encodings.Web.dll
 E:\project\LDC_Assessment\API\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
+E:\project\LDC_Assessment\API\obj\Debug\net8.0\API.sourcelink.json

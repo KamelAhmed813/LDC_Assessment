@@ -30,7 +30,7 @@ namespace API.Data
             modelBuilder.Entity<UserQuery>()
                 .HasOne(u => u.response)
                 .WithOne(r => r.query)
-            .HasForeignKey<ChatBotResponse>(r => r.queryID);
+            .HasForeignKey<ChatBotResponse>(r => r.queryId);
         }
     }
 }

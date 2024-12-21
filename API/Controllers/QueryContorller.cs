@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using API.Dtos;
+using API.Models;
+using API.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -12,24 +14,22 @@ namespace API.Controllers
     public class QueryContorller : ControllerBase
     {
         private readonly HttpClient _httpClient;
-        public QueryContorller(HttpClient httpClient){
+        private readonly UserQueryService _userQueryService;
+        public QueryContorller(HttpClient httpClient, UserQueryService userQueryService){
             _httpClient = httpClient;
+            _userQueryService = userQueryService;
         }
 
         [HttpPost]
         public async Task<ActionResult<String>> UserQuery([FromBody]UserQueryDto userQuery){
-            var url = $"{Request.Scheme}://{Request.Host}/API/DB/saveUserQuery";
+            int? queryId = await _userQueryService.SaveQueryAsync(
+                new UserQuery{
+                    query = userQuery.query
+                }
+            );
+            if(queryId != null){
+                var url = $"{Request.Scheme}://{Request.Host}/API/Bot/generateResponse";
                 JsonContent content = JsonContent.Create(
-                    new UserQueryDto{
-                        query = userQuery.query
-                    }
-                );
-            HttpResponseMessage saveQueryResponse = await _httpClient.PostAsync(url, content);
-
-            if(saveQueryResponse.StatusCode.Equals(HttpStatusCode.OK)){
-                int.TryParse(await saveQueryResponse.Content.ReadAsStringAsync(), out int queryId);
-                url = $"{Request.Scheme}://{Request.Host}/API/Bot/generateResponse";
-                content = JsonContent.Create(
                     new CreateResponseDto{
                         query = userQuery.query,
                         queryId = (int)queryId

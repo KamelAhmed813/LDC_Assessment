@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using API.Dtos;
 using System.Net;
+using API.Services;
+using API.Models;
 
 namespace API.Controllers
 {
@@ -24,23 +26,21 @@ namespace API.Controllers
     public class BotController : ControllerBase
     {
         private readonly HttpClient _httpClient;
-        public BotController(HttpClient httpClient){
+        private readonly UserQueryService _userQueryService;
+        public BotController(HttpClient httpClient, UserQueryService userQuery){
             _httpClient = httpClient;
+            _userQueryService = userQuery;
         }
 
-        [HttpGet("getResponse")]
-        public async Task<ActionResult<String>> getResponse([FromBody]SearchResponseDto searchResponseDto){
-            var url = $"{Request.Scheme}://{Request.Host}/API/DB/getBotResponse/{searchResponseDto.queryId}";
-            HttpResponseMessage getBotResponse = await _httpClient.GetAsync(url);
+        [HttpGet("getResponse/{queryId}")]
+        public async Task<ActionResult<String>> getResponse(int queryId){
+            String? botResponse = await _userQueryService.GetResponseAsync(queryId);
 
-            if(getBotResponse.StatusCode.Equals(HttpStatusCode.OK)){
-                return Ok(await getBotResponse.Content.ReadAsStringAsync());
+            if(botResponse != null){
+                return Ok(botResponse);
             }
             else{
-                url = $"{Request.Scheme}://{Request.Host}/API/DB/getQuery/{searchResponseDto.queryId}";
-                HttpResponseMessage getQueryResponse = await _httpClient.GetAsync(url);
-
-                if(getQueryResponse.StatusCode.Equals(HttpStatusCode.OK))
+                if(await _userQueryService.IsUserQuerySavedAsync(queryId))
                     return Ok("Your Query is still processing");
                 else
                     return StatusCode(400, "There was error processing this query please send new one");
@@ -54,17 +54,15 @@ namespace API.Controllers
             //Create SaveResponse Object with the response and the queryId
             String response = "Python processed the query and this is a sample response";
 
-            var url = $"{Request.Scheme}://{Request.Host}/API/DB/saveBotResponse";
-                JsonContent content = JsonContent.Create(
-                    new saveResponseDto{
-                        response = response,
+            int? responseId = await _userQueryService.SaveResponceAsync(
+                new ChatBotResponse{
+                    response = response,
                     queryId = createRequest.queryId
-                    }
-                );
-            HttpResponseMessage saveBotResponse = await _httpClient.PostAsync(url, content);
+                }
+            );
 
-            if(saveBotResponse.StatusCode.Equals(HttpStatusCode.OK))
-                return Ok("Your query response saved in DB");
+            if(responseId != null)
+                return Ok($"Your query response saved in DB with ID : {responseId}");
             else
                 return StatusCode(400, "Error Occured while trying to save bot response to DB");
             }

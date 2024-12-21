@@ -10,7 +10,7 @@ namespace API.Models
         public int id { get; set; }
         public String response { get; set; }
         public DateTime timestamp { get; set; }
-        public int? queryID { get; set; }
+        public int? queryId { get; set; }
         public UserQuery? query { get; set; }
     }
 }
