@@ -25,13 +25,11 @@ namespace API.Controllers
     [ApiController]
     public class BotController : ControllerBase
     {
-        private readonly HttpClient _httpClient;
         private readonly UserQueryService _userQueryService;
-        public BotController(HttpClient httpClient, UserQueryService userQuery){
-            _httpClient = httpClient;
+        public BotController(UserQueryService userQuery){
             _userQueryService = userQuery;
         }
-
+        /*
         [HttpGet("getResponse/{queryId}")]
         public async Task<ActionResult<String>> getResponse(int queryId){
             String? botResponse = await _userQueryService.GetResponseAsync(queryId);
@@ -46,6 +44,7 @@ namespace API.Controllers
                     return StatusCode(400, "There was error processing this query please send new one");
             }
         }
+        */
 
         [HttpPost("generateResponse")]
         public async Task<ActionResult<String>> askBot([FromBody]CreateResponseDto createRequest){
@@ -62,7 +61,7 @@ namespace API.Controllers
             );
 
             if(responseId != null)
-                return Ok($"Your query response saved in DB with ID : {responseId}");
+                return Ok(response);
             else
                 return StatusCode(400, "Error Occured while trying to save bot response to DB");
             }

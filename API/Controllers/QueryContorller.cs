@@ -35,11 +35,13 @@ namespace API.Controllers
                         queryId = (int)queryId
                     }
                 );
-                HttpResponseMessage botCreateResponse = await _httpClient.PostAsync(url, content);
-                if(botCreateResponse.StatusCode.Equals(HttpStatusCode.OK))
-                    return Ok("Query saved to DB and response generated and saved to DB");
-                else
-                    return Ok("Query saved to DB but error occured while generatinng response");
+                try{
+                    HttpResponseMessage botCreateResponse = await _httpClient.PostAsync(url, content);
+                    botCreateResponse.EnsureSuccessStatusCode();
+                    return Ok(await botCreateResponse.Content.ReadAsStringAsync());
+                }catch(Exception e){
+                    return StatusCode(400, "Query saved to DB but following error occured while generatinng response\n"+e.ToString());
+                }
             }
             else{
                 return StatusCode(400, "Error Occured while saving query to DB");
