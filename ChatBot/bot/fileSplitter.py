@@ -21,7 +21,7 @@ def createFileChunks(documentsDirectory):
                 f.close
                 fileCount+=1
                 current_chunk = sentence
-        if current_chunk:  # Add the last chunk
+        if current_chunk:
             f = open(os.path.join(fileChunksDirectory, f'chunk{fileCount}.txt'), 'w')
             f.write(current_chunk.strip())
             f.close

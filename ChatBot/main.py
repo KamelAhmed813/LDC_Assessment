@@ -1,4 +1,3 @@
-#pipfrom wsgiref.validate import validator
 import traceback
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -25,5 +24,4 @@ async def ask_bot(request: RequestModel):
         return {"queryId": query_id, "response": response}
     except Exception as e:
         tb = traceback.format_exc()
-        # Handle errors and return a 500 status code
         raise HTTPException(status_code=500, detail=f"Error processing query in function '{__name__}': {str(e)}")

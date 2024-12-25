@@ -1,15 +1,9 @@
 import os
-
-#openai.api_key = os.getenv("OPENAI_API_KEY")
+from transformers import pipeline
 
 def generate_response(query, context):
-    prompt = f"Answer the following question based on the context:\n\nContext: {context}\n\nQuestion: {query}"
-    return f"The Answer for your query\n{query}\nis in the following Context:\n{context}"
-    '''
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=prompt,
-        max_tokens=300
-    )
-    return response.choices[0].text.strip()
-    '''
+    model_name="EleutherAI/gpt-neo-1.3B"
+    generator = pipeline('text-generation', model=model_name)
+    prompt = f"Context: {context}\n\nQuestion: {query}\n\nAnswer:"
+    response = generator(prompt, eos_token_id=50256, do_sample=True, temperature=0.1, min_length=50, max_length=150, truncation=True, top_k=50, repetition_penalty=2.0)
+    return response[0]['generated_text'].replace(prompt, "").strip().split('\n')[0]

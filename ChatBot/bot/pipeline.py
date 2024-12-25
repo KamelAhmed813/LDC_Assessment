@@ -12,9 +12,7 @@ def prepare_vectorStore():
 def query_pipeline(query):
     directory = r"E:\project\LDC_Assessment\ChatBot\data\fileChunks"
     AllChunks = [open(os.path.join(directory, f), 'r').read() for f in os.listdir(directory)]
-    print("Chunks length is "+str(len(AllChunks)))
     vectorStore = faiss.read_index(r'E:\project\LDC_Assessment\ChatBot\data\vectorStore\vector_store.faiss')
 
     context = retrieve_relevant_chunks(query, vectorStore)
-    print("retrieve_relevant_chunks Ended and the context is\n"+context)
     return generate_response(query, context)

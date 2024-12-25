@@ -9,6 +9,8 @@ using API.Dtos;
 using System.Net;
 using API.Services;
 using API.Models;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace API.Controllers
 {
@@ -50,20 +52,21 @@ namespace API.Controllers
 
         [HttpPost("generateResponse")]
         public async Task<ActionResult<String>> askBot([FromBody]CreateResponseDto createRequest){
-            var url = "http://127.0.0.1:8080/ask";
+            var url = "http://127.0.0.1:8090/ask";
             JsonContent content = JsonContent.Create(createRequest);
             try{
                 HttpResponseMessage botModelResponse = await _httpClient.PostAsync(url, content);
                 botModelResponse.EnsureSuccessStatusCode();
                 String botModelResponseBody = await botModelResponse.Content.ReadAsStringAsync();
+                saveResponseDto botResponse = JsonSerializer.Deserialize<saveResponseDto>(botModelResponseBody);
                 int? responseId = await _userQueryService.SaveResponceAsync(
                     new ChatBotResponse{
-                        response = botModelResponseBody,
-                        queryId = createRequest.queryId
+                        response = botResponse.response,
+                        queryId = botResponse.queryId
                     }
                 );
                 if(responseId != null)
-                    return Ok(botModelResponseBody);
+                    return Ok(botResponse.response);
                 else
                     return StatusCode(400, "Error Occured while trying to save bot response to DB");
             }catch(Exception e){
