@@ -26,8 +26,10 @@ namespace API.Controllers
     public class BotController : ControllerBase
     {
         private readonly UserQueryService _userQueryService;
-        public BotController(UserQueryService userQuery){
+        private readonly HttpClient _httpClient;
+        public BotController(UserQueryService userQuery, HttpClient httpClient){
             _userQueryService = userQuery;
+            _httpClient = httpClient;
         }
         /*
         [HttpGet("getResponse/{queryId}")]
@@ -48,6 +50,27 @@ namespace API.Controllers
 
         [HttpPost("generateResponse")]
         public async Task<ActionResult<String>> askBot([FromBody]CreateResponseDto createRequest){
+            var url = "http://127.0.0.1:8080/ask";
+            JsonContent content = JsonContent.Create(createRequest);
+            try{
+                HttpResponseMessage botModelResponse = await _httpClient.PostAsync(url, content);
+                botModelResponse.EnsureSuccessStatusCode();
+                String botModelResponseBody = await botModelResponse.Content.ReadAsStringAsync();
+                int? responseId = await _userQueryService.SaveResponceAsync(
+                    new ChatBotResponse{
+                        response = botModelResponseBody,
+                        queryId = createRequest.queryId
+                    }
+                );
+                if(responseId != null)
+                    return Ok(botModelResponseBody);
+                else
+                    return StatusCode(400, "Error Occured while trying to save bot response to DB");
+            }catch(Exception e){
+                return StatusCode(500, "Some error occured\n"+e.ToString());
+            }
+        }
+            /*
             //Have both query and queryId
             //Send to python Model the query and wait for the response
             //Create SaveResponse Object with the response and the queryId
@@ -65,5 +88,6 @@ namespace API.Controllers
             else
                 return StatusCode(400, "Error Occured while trying to save bot response to DB");
             }
+            */
     }
 }
