@@ -46,19 +46,19 @@ Navigate to the `\ChatBot` directory:
 	`cd ChatBot`
 
 1. Create and activate a Python virtual environment:  
-   bash  
+
    `python -m venv venv`
 
-`venv\Scripts\activate`
+   `venv\Scripts\activate`
 
 2. Install required Python packages:  
-   bash  
+
    `pip install -r requirements.txt`
 
 ### **Step 3: Database Configuration**
 
 Update the connection string in the .NET project (`\API\appsettings.json`) to match your Microsoft SQL Server instance:  
-json  
+
 `"ConnectionStrings": {`  
     `"DefaultConnection": "Server=[your_server_name];Database=[your_database_name];Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"`  
 `}`
