@@ -1,50 +1,29 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using API.Dtos;
-using API.Models;
-using API.Services;
+using API.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
-    [Route("API/query")]
+    [Route("query")]
     [ApiController]
-    public class QueryContorller : ControllerBase
+    public class QueryContorller(IBusinessLogicService businessLogic) : ControllerBase
     {
-        private readonly HttpClient _httpClient;
-        private readonly UserQueryService _userQueryService;
-        public QueryContorller(HttpClient httpClient, UserQueryService userQueryService){
-            _httpClient = httpClient;
-            _userQueryService = userQueryService;
-        }
+        private readonly IBusinessLogicService _businessLogic=businessLogic;
 
         [HttpPost]
-        public async Task<ActionResult<String>> UserQuery([FromBody]UserQueryDto userQuery){
-            int? queryId = await _userQueryService.SaveQueryAsync(
-                new UserQuery{
-                    query = userQuery.query
-                }
-            );
-            if(queryId != null){
-                var url = $"{Request.Scheme}://{Request.Host}/API/Bot/generateResponse";
-                JsonContent content = JsonContent.Create(
-                    new CreateResponseDto{
-                        query = userQuery.query,
-                        queryId = (int)queryId
-                    }
-                );
-                try{
-                    HttpResponseMessage botCreateResponse = await _httpClient.PostAsync(url, content);
-                    botCreateResponse.EnsureSuccessStatusCode();
-                    return Ok(await botCreateResponse.Content.ReadAsStringAsync());
-                }catch(Exception e){
-                    return StatusCode(400, "Query saved to DB but following error occured while generatinng response\n"+e.ToString());
-                }
+        public async Task<ActionResult<string>> UserQuery([FromBody]string query){
+            try{
+                string response = await _businessLogic.ProcessUserQueryAsync(query);
+                return Ok(response);
             }
-            else{
-                return StatusCode(400, "Error Occured while saving query to DB");
+            catch(DbUpdateException e){
+                return StatusCode(400, $"Database error occured:\n{e.InnerException?.Message}");
+            }
+            catch(HttpRequestException e){
+                return StatusCode(400, $"Error occured while communicating with the bot model:\n{e.ToString()}");
+            }
+            catch(Exception e){
+                return StatusCode(500, $"Error occured while generatinng response:\n{e.InnerException?.ToString()}");
             }
         }
     }
